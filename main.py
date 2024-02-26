@@ -1,8 +1,11 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
-from image_scraper import download_images
+from image_scraper import extract_images
+from resume_parser import extract_text_from_pdf
+from ai_generator import generate_summary, generate_resume_overview
 
 load_dotenv()
 
@@ -38,12 +41,44 @@ def my_middleware(app):
     return middleware
 
 
+def clean_text(text):
+    return text.replace("\n", " ").replace("\r", " ").replace("\t", " ").strip()
+
 @app.post("/api/fetch-designer-input")
 async def fetch_designer_input(request: Request):
     designer_input = await request.json()
-    print(designer_input)
-    return ...
+    if "PortfolioUrl" in designer_input and designer_input["PortfolioUrl"] != None:
+        portfolio_url = designer_input["PortfolioUrl"]
+        images = extract_images(portfolio_url)
+        resume_file_path = "data/www.paulawrzecionowska.com/resume.pdf"
+        resume_text = extract_text_from_pdf(resume_file_path)
+        summary = clean_text(generate_summary(images))
+        overview = clean_text(generate_resume_overview(resume_text))
+        
+        result = {
+            "images": images,
+            "summary": summary,
+            "overview": overview,
+        }
+
+        return result
+    else:
+        result = {
+            "error": "PortfolioUrl is required",
+        }
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    test_url = "https://www.peternoah.com/"
+    images = extract_images(test_url)
+    print(images)
+    resume_file_path = "data/www.paulawrzecionowska.com/resume.pdf"
+    resume_text = extract_text_from_pdf(resume_file_path)
+    summary = clean_text(generate_summary(images))
+    overview = clean_text(generate_resume_overview(resume_text))
+    
+    print(
+        f"Summary: {summary}\nOverview: {overview}"
+    )
+
+    return {"images": images, "summary": summary, "overview": overview}

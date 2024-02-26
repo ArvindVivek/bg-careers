@@ -1,31 +1,51 @@
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY")
+)
 
-def generate_summary(photo):
-    response = openai.Completion.create(
-        engine='davinci',
-        prompt=f"Summarize the content in this design UI/UX photo: {photo}",
-        max_tokens=100,
-        temperature=0.5,
-        n=1,
-        stop=None
+def generate_summary(photos):
+    content_arr = [
+        {
+            "type": "text",
+            "text": "Respond with no formatting. I am applying to design, UI/UX and product roles with these designs. I would like a summary of my work to include in my portfolio. Here are some of my designs: ",
+        },
+    ]
+
+    for photo in photos:
+        content_arr.append({
+            "type": "image_url",
+            "image_url": {
+                "url": photo,
+            },
+        })
+
+    response = client.chat.completions.create(
+        model="gpt-4-vision-preview",
+        messages=[
+            {
+                "role": "user",
+                "content": content_arr,
+            }
+        ],
+        max_tokens=300,
     )
-    summary = response.choices[0].text.strip()
+    summary = response.choices[0].message.content
+
     return summary
 
 def generate_resume_overview(resume):
-    response = openai.Completion.create(
-        engine='davinci',
-        prompt=f"Generate an overview of the content in this resume with highlighted skills/experience in design: {resume}",
-        max_tokens=100,
-        temperature=0.5,
-        n=1,
-        stop=None
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful design/UI/UX/product hiring assistant. Respond with no formatting."},
+            {"role": "user", "content": f"I am applying to design, UI/UX and product roles with this resume, give me a brief overview: {resume}"}
+        ]
     )
-    overview = response.choices[0].text.strip()
+
+    overview = response.choices[0].message.content
     return overview
