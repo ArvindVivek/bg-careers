@@ -23,16 +23,6 @@ def vespa_query(query):
     jobs = data[:5]
     results = []
 
-    """
-    given this data for each job:  "company_name": "Adobe",
-        "position_title": "Design Engineer, Full Stack Web",
-        "salary": "$108,000 -- $198,500 annually",
-        "location_remote": "San Francisco, California",
-        "time": "Full-Time",
-
-    create a new string that appends like this "Adobe | Design Engineer, Full Stack Web | $108,000 -- $198,500 annually | San Francisco, California | Full-Time"
-    """
-
     for job in jobs:
         result = job["company_name"] + " | " + job["position_title"] + " | " + job["salary"] + " | " + job["location_remote"] + " | " + job["time"]
         results.append(result)
