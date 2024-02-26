@@ -32,7 +32,7 @@ def generate_summary(photos):
                 "content": content_arr,
             }
         ],
-        max_tokens=300,
+        max_tokens=100,
     )
     summary = response.choices[0].message.content
 
@@ -43,8 +43,9 @@ def generate_resume_overview(resume):
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a helpful design/UI/UX/product hiring assistant. Respond with no formatting."},
-            {"role": "user", "content": f"I am applying to design, UI/UX and product roles with this resume, give me a brief overview: {resume}"}
-        ]
+            {"role": "user", "content": f"I am applying to design, UI/UX and product roles with this resume, give me the types of jobs specific for me based on my resume: {resume}"}
+        ],
+        max_tokens=50,
     )
 
     overview = response.choices[0].message.content

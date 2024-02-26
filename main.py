@@ -6,6 +6,7 @@ import os
 from image_scraper import extract_images
 from resume_parser import extract_text_from_pdf
 from ai_generator import generate_summary, generate_resume_overview
+from vespa_query import vespa_query
 
 load_dotenv()
 
@@ -49,16 +50,20 @@ async def fetch_designer_input(request: Request):
     designer_input = await request.json()
     if "PortfolioUrl" in designer_input and designer_input["PortfolioUrl"] != None:
         portfolio_url = designer_input["PortfolioUrl"]
+        resume_url = "https://careerdocs.charlotte.edu/resumes/AMD/Graphic%20Designer%20Resume%20Example.pdf"
+
         images = extract_images(portfolio_url)
-        resume_file_path = "data/www.paulawrzecionowska.com/resume.pdf"
-        resume_text = extract_text_from_pdf(resume_file_path)
+
+        resume_text = extract_text_from_pdf(resume_url)
         summary = clean_text(generate_summary(images))
         overview = clean_text(generate_resume_overview(resume_text))
+        jobs = vespa_query(resume_text)
         
         result = {
             "images": images,
-            "summary": summary,
-            "overview": overview,
+            "summary": "dfasd",
+            "overview": "sdfasd",
+            "jobs": jobs
         }
 
         return result
