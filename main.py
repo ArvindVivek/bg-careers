@@ -61,8 +61,8 @@ async def fetch_designer_input(request: Request):
         
         result = {
             "images": images,
-            "summary": "dfasd",
-            "overview": "sdfasd",
+            "summary": summary,
+            "overview": overview,
             "jobs": jobs
         }
 
